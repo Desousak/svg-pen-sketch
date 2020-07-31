@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-class Canvas {
+export default class Canvas {
     constructor(element) {
         this._element = d3.select(element);
 
@@ -134,11 +134,9 @@ class Canvas {
         this._element.on("pointermove", null);
         this._element.on("pointerup", null);
         this._element.on("pointerleave", null);
-
+        
         if (this.eraserUpCallback != undefined) {
             this.eraserUpCallback(d3.event);
         }
     }
 }
-
-module.exports = Canvas;

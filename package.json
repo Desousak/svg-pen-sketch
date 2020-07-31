@@ -1,10 +1,10 @@
 {
-    "name": "canvas-js",
+    "name": "canvas-draw-js",
     "version": "1.0.0",
     "description": "A easy-to-use JavaScript library aimed at making it easier to draw on SVG elements.",
-    "repository": "desousak/canvas-js",
+    "repository": "desousak/canvas-draw-js",
     "main": "dist/canvas.js",
-    "private": true,
+    "private": false,
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "webpack --config webpack.config.js"
