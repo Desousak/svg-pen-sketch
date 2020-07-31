@@ -5,5 +5,6 @@ module.exports = {
     output: {
         filename: 'canvas.js',
         path: path.resolve(__dirname, 'dist'),
+        library: 'canvas-js',
     },
 };
