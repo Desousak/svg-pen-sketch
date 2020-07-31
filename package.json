@@ -1,7 +1,7 @@
 {
     "name": "canvas-draw-js",
     "version": "1.0.2",
-    "description": "A easy-to-use JavaScript library aimed at making it easier to draw on SVG elements when using a digital pen (such as the Surface Pen).",
+    "description": "An easy-to-use JavaScript library aimed at making it easier to draw on SVG elements when using a digital pen (such as the Surface Pen).",
     "repository": "desousak/canvas-draw-js",
     "main": "dist/canvas.js",
     "private": false,
