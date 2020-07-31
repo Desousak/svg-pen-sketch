@@ -20,3 +20,6 @@ canvas.eraserUpCallback = (event) => {};
 
 ## Todo
 - Tests need to be made
+
+<br>
+<img src="https://img.shields.io/npm/v/canvas-draw-js?style=flat-square">

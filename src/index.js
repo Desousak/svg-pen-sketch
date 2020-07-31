@@ -22,7 +22,7 @@ export default class Canvas {
                 .curve(d3.curveBasis);
 
             // Variable for if the pointer event is a pen
-            this.isPen = false;
+            this._isPen = false;
 
             // Resize the canvas viewbox on window resize
             window.onresize = _ => {
@@ -34,7 +34,7 @@ export default class Canvas {
 
             // Stop touch scrolling
             this._element.on("touchstart", _ => {
-                if (this.isPen) d3.event.preventDefault();
+                if (this._isPen) d3.event.preventDefault();
             });
         }
     }
@@ -70,9 +70,9 @@ export default class Canvas {
     handlePointer() {
         // If the pointer is a pen - prevent the touch event
         if (d3.event.pointerType == "touch") {
-            this.isPen = false;
+            this._isPen = false;
         } else {
-            this.isPen = true;
+            this._isPen = true;
         }
 
         // Determine if the pen tip or eraser is being used
