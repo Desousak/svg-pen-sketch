@@ -1,6 +1,6 @@
 {
     "name": "canvas-draw-js",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "A easy-to-use JavaScript library aimed at making it easier to draw on SVG elements.",
     "repository": "desousak/canvas-draw-js",
     "main": "dist/canvas.js",

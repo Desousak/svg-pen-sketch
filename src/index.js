@@ -1,38 +1,42 @@
 import * as d3 from "d3";
 
 export default class Canvas {
-    constructor(element) {
-        this._element = d3.select(element);
+    constructor(element = null) {
+        if (element === null) {
+            console.error("CanvasDrawJS needs a svg element in the constructor to work");
+        } else {
+            this._element = d3.select(element);
 
-        // Pen Callbacks
-        this.penDownCallback = _ => { };
-        this.penUpCallback = _ => { };
+            // Pen Callbacks
+            this.penDownCallback = _ => { };
+            this.penUpCallback = _ => { };
 
-        // Eraser Callbacks
-        this.eraserDownCallback = _ => { };
-        this.eraserUpCallback = _ => { };
+            // Eraser Callbacks
+            this.eraserDownCallback = _ => { };
+            this.eraserUpCallback = _ => { };
 
-        // Line function for drawing
-        this._lineFunc = d3.line()
-            .x((d) => d[0])
-            .y((d) => d[1])
-            .curve(d3.curveBasis);
+            // Line function for drawing
+            this._lineFunc = d3.line()
+                .x((d) => d[0])
+                .y((d) => d[1])
+                .curve(d3.curveBasis);
 
-        // Variable for if the pointer event is a pen
-        this.isPen = false;
+            // Variable for if the pointer event is a pen
+            this.isPen = false;
 
-        // Resize the canvas viewbox on window resize
-        window.onresize = _ => {
-            this.resizeCanvas()
-        };
+            // Resize the canvas viewbox on window resize
+            window.onresize = _ => {
+                this.resizeCanvas()
+            };
 
-        // Prep the canvas for drawing
-        this._element.on("pointerdown", _ => this.handlePointer());
+            // Prep the canvas for drawing
+            this._element.on("pointerdown", _ => this.handlePointer());
 
-        // Stop touch scrolling
-        this._element.on("touchstart", _ => {
-            if (this.isPen) d3.event.preventDefault();
-        });
+            // Stop touch scrolling
+            this._element.on("touchstart", _ => {
+                if (this.isPen) d3.event.preventDefault();
+            });
+        }
     }
 
     getElement() { return this._element.node(); }
@@ -134,7 +138,7 @@ export default class Canvas {
         this._element.on("pointermove", null);
         this._element.on("pointerup", null);
         this._element.on("pointerleave", null);
-        
+
         if (this.eraserUpCallback != undefined) {
             this.eraserUpCallback(d3.event);
         }
