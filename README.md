@@ -42,6 +42,8 @@ canvas.eraserUpCallback = (event) => {};
 
 ## Todo
 - Tests need to be made
+- Add some error checking for the element passed in the constructor
+- Add some options to change stroke styles
 
 <br>
 <img src="https://img.shields.io/npm/v/svg-pen-sketch?style=flat-square">
