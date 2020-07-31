@@ -9,8 +9,5 @@ module.exports = {
         library: 'SvgPenSketch',
         libraryTarget: 'umd',
         umdNamedDefine: true,
-    },
-    externals: {
-        d3: 'd3'
     }
 };
