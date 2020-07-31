@@ -1,9 +1,9 @@
 import * as d3 from "d3";
 
-export default class Canvas {
+export default class SvgSketch {
     constructor(element = null) {
         if (element === null) {
-            console.error("CanvasDrawJS needs a svg element in the constructor to work");
+            console.error("svg-sketch needs a svg element in the constructor to work");
         } else {
             this._element = d3.select(element);
 

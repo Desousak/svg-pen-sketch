@@ -1,16 +1,20 @@
 {
-    "name": "canvas-draw-js",
-    "version": "1.0.2",
+    "name": "svg-sketch",
+    "version": "1.0.0",
     "description": "An easy-to-use JavaScript library aimed at making it easier to draw on SVG elements when using a digital pen (such as the Surface Pen).",
-    "repository": "desousak/canvas-draw-js",
-    "main": "dist/canvas.js",
+    "repository": "desousak/svg-sketch",
+    "main": "dist/svg-sketch.js",
+    "files": [
+        "dist"
+    ],
     "private": false,
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "webpack --config webpack.config.js"
+        "start": "webpack --watch",
+        "build": "webpack --mode development",
+        "prepare": "webpack --mode production",
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [
-        "canvas",
         "draw",
         "svg",
         "pen"

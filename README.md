@@ -1,12 +1,12 @@
-# canvas-draw-js
+# svg-sketch
 An easy-to-use JavaScript library aimed at making it easier to draw on SVG elements when using a digital pen (such as the Surface Pen). 
 
 ## How to use
 ```javascript
-import CanvasDrawJS from "canvas-draw-js";
+import svgSketch from "svg-sketch";
 
 // Prep the svg element to be drawn on
-const canvas = new CanvasDrawJS(document.querySelector("svg"));
+const canvas = new svgSketch(document.querySelector("svg"));
 
 
 // Callbacks can be set for various events
@@ -22,4 +22,4 @@ canvas.eraserUpCallback = (event) => {};
 - Tests need to be made
 
 <br>
-<img src="https://img.shields.io/npm/v/canvas-draw-js?style=flat-square">
+<img src="https://img.shields.io/npm/v/svg-sketch?style=flat-square">
