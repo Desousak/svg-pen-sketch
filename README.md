@@ -6,7 +6,7 @@ A easy-to-use JavaScript library aimed at making it easier to draw on SVG elemen
 import CanvasDrawJS from "canvas-draw-js";
 
 // Prep the svg element to be drawn on
-const canvas = new Canvas(document.querySelector("svg"));
+const canvas = new CanvasDrawJS(document.querySelector("svg"));
 
 
 // Callbacks can be set for various events
