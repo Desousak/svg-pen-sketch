@@ -4,9 +4,9 @@ module.exports = {
     entry: './src/index.js',
     target: 'web', 
     output: {
-        filename: 'svg-sketch.js',
+        filename: 'svg-pen-sketch.js',
         path: path.resolve(__dirname, 'dist'),
-        library: 'SvgSketchJS',
+        library: 'SvgPenSketch',
         libraryTarget: 'umd',
         umdNamedDefine: true,
     },

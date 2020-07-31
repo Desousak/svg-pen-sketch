@@ -1,9 +1,9 @@
 import * as d3 from "d3";
 
-export default class SvgSketch {
+export default class SvgPenSketch {
     constructor(element = null) {
         if (element === null) {
-            console.error("svg-sketch needs a svg element in the constructor to work");
+            console.error("svg-pen-sketch needs a svg element in the constructor to work");
         } else {
             this._element = d3.select(element);
 
