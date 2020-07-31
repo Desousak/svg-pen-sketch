@@ -1,0 +1,27 @@
+{
+    "name": "canvas-js",
+    "version": "1.0.0",
+    "description": "A easy-to-use JavaScript library aimed at making it easier to draw on SVG elements.",
+    "repository": "desousak/canvas-js",
+    "main": "dist/canvas.js",
+    "private": true,
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack --config webpack.config.js"
+    },
+    "keywords": [
+        "canvas",
+        "draw",
+        "svg",
+        "pen"
+    ],
+    "author": "desousak",
+    "license": "ISC",
+    "devDependencies": {
+        "webpack": "^4.43.0",
+        "webpack-cli": "^3.3.12"
+    },
+    "dependencies": {
+        "d3": "~5.16.0"
+    }
+}
