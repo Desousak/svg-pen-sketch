@@ -7,4 +7,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         library: 'canvasdrawjs'
     },
+    optimization: {
+        minimize: true
+    }
 };
