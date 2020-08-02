@@ -1,6 +1,6 @@
 {
     "name": "svg-pen-sketch",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "An easy-to-use JavaScript library aimed at making it easier to draw on SVG elements when using a digital pen (such as the Surface Pen).",
     "repository": "desousak/svg-pen-sketch",
     "main": "dist/svg-pen-sketch.js",
@@ -12,7 +12,7 @@
         "start": "webpack --watch",
         "build": "webpack --mode development",
         "prepare": "webpack --mode production",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "jest"
     },
     "keywords": [
         "draw",
@@ -22,10 +22,16 @@
     "author": "desousak",
     "license": "BSD-3-Clause",
     "devDependencies": {
+        "@babel/core": "^7.11.0",
+        "@babel/preset-env": "^7.11.0",
+        "babel-loader": "^8.1.0",
+        "jest": "^26.2.2",
         "webpack": "^4.43.0",
         "webpack-cli": "^3.3.12"
     },
     "dependencies": {
+        "@babel/runtime": "^7.11.0",
+        "core-js": "^3.6.5",
         "d3": "~5.16.0"
     }
 }

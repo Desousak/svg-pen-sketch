@@ -35,7 +35,7 @@ export default class SvgPenSketch {
             this.eraserDownCallback = _ => { };
             this.eraserUpCallback = _ => { };
         } else {
-            console.error("svg-pen-sketch needs a svg element in the constructor to work");
+            throw new Error("svg-pen-sketch needs a svg element in the constructor to work");
         }
     }
 
