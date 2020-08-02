@@ -1,44 +1,45 @@
 import * as d3 from "d3";
 
 export default class SvgPenSketch {
-    constructor(element = null) {
-        if (element === null) {
-            console.error("svg-pen-sketch needs a svg element in the constructor to work");
-        } else {
+    constructor(element = null, strokeStyles = { "stroke": "black", "stroke-width": "1px" }) {
+        // If the element is a valid 
+        if (element != null && typeof (element) === "object" && element.nodeType) {
+            // Private variables
+            // The root SVG element
             this._element = d3.select(element);
-
-            // Pen Callbacks
-            this.penDownCallback = _ => { };
-            this.penUpCallback = _ => { };
-
-            // Eraser Callbacks
-            this.eraserDownCallback = _ => { };
-            this.eraserUpCallback = _ => { };
-
             // Line function for drawing
             this._lineFunc = d3.line()
                 .x((d) => d[0])
                 .y((d) => d[1])
                 .curve(d3.curveBasis);
-
             // Variable for if the pointer event is a pen
             this._isPen = false;
-
             // Resize the canvas viewbox on window resize
             window.onresize = _ => {
-                this.resizeCanvas()
+                this.resizeCanvas();
             };
-
             // Prep the canvas for drawing
-            this._element.on("pointerdown", _ => this.handlePointer());
-
+            this._element.on("pointerdown", _ => this._handlePointer());
             // Stop touch scrolling
             this._element.on("touchstart", _ => {
                 if (this._isPen) d3.event.preventDefault();
             });
+
+            // Public variables
+            // Styles for the stroke
+            this.strokeStyles = strokeStyles;
+            // Pen Callbacks
+            this.penDownCallback = _ => { };
+            this.penUpCallback = _ => { };
+            // Eraser Callbacks
+            this.eraserDownCallback = _ => { };
+            this.eraserUpCallback = _ => { };
+        } else {
+            console.error("svg-pen-sketch needs a svg element in the constructor to work");
         }
     }
 
+    // Public functions
     getElement() { return this._element.node(); }
 
     resizeCanvas() {
@@ -67,7 +68,8 @@ export default class SvgPenSketch {
         return false;
     }
 
-    handlePointer() {
+    // Private functions
+    _handlePointer() {
         // If the pointer is a pen - prevent the touch event
         if (d3.event.pointerType == "touch") {
             this._isPen = false;
@@ -82,27 +84,30 @@ export default class SvgPenSketch {
             case (0):
                 // Create the path/coordinate arrays and set event handlers
                 let penCoords = [];
-                let strokePath = this._element.append("path")
-                    .style("stroke", "red")
-                    .style("stroke-width", "1px");
+                let strokePath = this._element.append("path");
+
+                // Apply all user-desired styles
+                for (let styleName of this.strokeStyles) {
+                    strokePath.style(styleName, this.strokeStyles[styleName]);
+                }
 
                 // Create the drawing event handlers
-                this._element.on("pointermove", _ => this.onDraw(strokePath, penCoords));
-                this._element.on("pointerup", _ => this.stopDraw(strokePath));
-                this._element.on("pointerleave", _ => this.stopDraw(strokePath));
+                this._element.on("pointermove", _ => this._onDraw(strokePath, penCoords));
+                this._element.on("pointerup", _ => this._stopDraw(strokePath));
+                this._element.on("pointerleave", _ => this._stopDraw(strokePath));
                 break;
 
             // Eraser
             case (5):
                 // Create the erase event handlers
-                this._element.on("pointermove", _ => this.onErase());
-                this._element.on("pointerup", _ => this.stopErase());
-                this._element.on("pointerleave", _ => this.stopErase());
+                this._element.on("pointermove", _ => this._onErase());
+                this._element.on("pointerup", _ => this._stopErase());
+                this._element.on("pointerleave", _ => this._stopErase());
                 break;
         }
     }
 
-    onDraw(strokePath, penCoords) {
+    _onDraw(strokePath, penCoords) {
         if (d3.event.pointerType != "touch") {
             // Add the points to the path
             penCoords.push([d3.event.offsetX, d3.event.offsetY]);
@@ -114,7 +119,7 @@ export default class SvgPenSketch {
         }
     }
 
-    stopDraw(strokePath) {
+    _stopDraw(strokePath) {
         // Remove the event handlers
         this._element.on("pointermove", null);
         this._element.on("pointerup", null);
@@ -125,7 +130,7 @@ export default class SvgPenSketch {
         }
     }
 
-    onErase() {
+    _onErase() {
         // Remove any paths in the way
         let removedPath = this.removePath(d3.event.pageX, d3.event.pageY);
 
@@ -134,7 +139,7 @@ export default class SvgPenSketch {
         }
     }
 
-    stopErase() {
+    _stopErase() {
         this._element.on("pointermove", null);
         this._element.on("pointerup", null);
         this._element.on("pointerleave", null);
