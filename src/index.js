@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import "./index.css";
 
 export default class SvgPenSketch {
     constructor(element = null, strokeStyles = { "stroke": "black", "stroke-width": "1px" }) {
@@ -27,7 +28,7 @@ export default class SvgPenSketch {
 
             // Public variables
             // Styles for the stroke
-            this.strokeStyles = strokeStyles;
+            this.strokeStyles = { ...strokeStyles };
             // Pen Callbacks
             this.penDownCallback = _ => { };
             this.penUpCallback = _ => { };
@@ -50,11 +51,11 @@ export default class SvgPenSketch {
     getPathAtPoint(x, y) {
         // Get any paths at a specified x and y location
         let elements = document.elementsFromPoint(x, y);
-        for (let element of elements) {
+        elements.forEach(element => {
             if (element.nodeName == "path") {
                 return element;
             }
-        }
+        });
         return undefined;
     }
 
@@ -87,7 +88,7 @@ export default class SvgPenSketch {
                 let strokePath = this._element.append("path");
 
                 // Apply all user-desired styles
-                for (let styleName of this.strokeStyles) {
+                for (let styleName in this.strokeStyles) {
                     strokePath.style(styleName, this.strokeStyles[styleName]);
                 }
 
