@@ -51,11 +51,9 @@ export default class SvgPenSketch {
     getPathAtPoint(x, y) {
         // Get any paths at a specified x and y location
         let elements = document.elementsFromPoint(x, y);
-        elements.forEach(element => {
-            if (element.nodeName == "path") {
-                return element;
-            }
-        });
+        for (let element of elements) {
+            if (element.nodeName === "path") return element;
+        }
         return undefined;
     }
 
