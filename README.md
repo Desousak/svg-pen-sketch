@@ -63,6 +63,8 @@ canvas.eraserUpCallback = (event) => {};
 2) Run `npm run build` to generate a development build 
 3) Run `npm run test` to generate and test a build (uses the tests located in `tests/`)
 
+#### _Demos can be found in the `demos/` folder - make sure you build the project at least once before running them_ ####
+
 ## Todo
 - More tests need to be made
 - ~~Add some error checking for the element passed in the constructor~~

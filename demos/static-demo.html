@@ -1,0 +1,73 @@
+<head></head>
+
+<body>
+    <svg>
+        <text x="50%" y="50%" text-anchor="middle">SVG PEN SKETCH DEMO</text>
+        <text x="50%" y="53%" text-anchor="middle"># of strokes on screen: <tspan id="stroke-count">0</tspan></text>
+    </svg>
+
+    <script src="../dist/svg-pen-sketch.js"></script>
+    <script>
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        let strokeAmnt = 0; // Stroke counter
+        window.onload = _ => {
+            try {
+                let svgSketch = SvgPenSketch.default;
+
+                // Prep the svg element to be drawn on
+                const canvas = new svgSketch(document.querySelector("svg"), { "stroke": "black", "stroke-width": "1px" });
+
+                // Callbacks can be set for various events
+                canvas.penDownCallback = (path, event) => {
+                    // Set a random color for the stroke 
+                    let color = getRandomColor();
+                    path.style.stroke = color;
+
+                    // Console log the pointer location
+                    console.log(`Pointer location = (${event.offsetX},${event.offsetY}) @ ${event.timeStamp}`);
+                };
+                canvas.penUpCallback = (path, event) => {
+                    // Update the stroke count and text
+                    strokeAmnt++;
+                    document.querySelector("#stroke-count").innerHTML = strokeAmnt;
+                    console.log("Pointer left");
+                };
+            } catch (err) {
+                // Display error text 
+                let textElement = document.querySelector("text:nth-child(2)");
+                textElement.innerHTML = `Make sure you built the project for this demo to work`;
+                textElement.setAttribute("font-style", "italic");
+                
+                // Update the color randomly
+                setInterval(_ => {
+                    console.log("test");
+                    textElement.style.fill = getRandomColor();
+                }, 500);
+
+            }
+        }
+    </script>
+</body>
+
+<style>
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    svg text {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        transition: all 0.5s ease-in-out;
+    }
+</style>
