@@ -3,12 +3,12 @@ let SvgPenSketch = require("../dist/svg-pen-sketch.js").default;
 // Set up our document body
 document.body.innerHTML = ` 
 <div>
-    <svg id="svgTest"></svg>
+    <svg></svg>
 </div>
 `;
 
 test("Initialize the class with a DOM element", () => {
-    expect(typeof (new SvgPenSketch(document.getElementById("svgTest")))).toBe("object");
+    expect(typeof (new SvgPenSketch(document.querySelector("svg")))).toBe("object");
 });
 
 test("Catch improper class initialization", () => {
@@ -22,12 +22,12 @@ test("Catch improper class initialization", () => {
 });
 
 test("Get the DOM element from the class", () => {
-    let tmp = new SvgPenSketch(document.getElementById("svgTest"));
+    let tmp = new SvgPenSketch(document.querySelector("svg"));
     expect(tmp.getElement().nodeType).toBe(1);
 });
 
 test("Try getting a path at (x,y) from the svg canvas", () => {
-    let tmp = new SvgPenSketch(document.getElementById("svgTest"));
+    let tmp = new SvgPenSketch(document.querySelector("svg"));
     // We have to fake the elementsFromPoint function since this isn't a browser
     document.elementsFromPoint = (x,y) => {
         return [{nodeName : "other"},{nodeName : "path"}];
@@ -35,8 +35,8 @@ test("Try getting a path at (x,y) from the svg canvas", () => {
     expect(tmp.getPathAtPoint(0,0).nodeName).toBe("path");
 });
 
-test("Try getting a non-existent path at (x,y) from the svg canvas (should return undefined)", () => {
-    let tmp = new SvgPenSketch(document.getElementById("svgTest"));
+test("Try getting a non-existent path at (x,y) from the svg canvas", () => {
+    let tmp = new SvgPenSketch(document.querySelector("svg"));
     // We have to fake the elementsFromPoint function since this isn't a browser
     document.elementsFromPoint = (x,y) => {
         return [];
@@ -44,11 +44,22 @@ test("Try getting a non-existent path at (x,y) from the svg canvas (should retur
     expect(tmp.getPathAtPoint(0,0)).toBe(undefined);
 });
 
-test("Try removing a a path from the svg canvas (should return undefined)", () => {
-    let tmp = new SvgPenSketch(document.getElementById("svgTest"));
+test("Try removing a path from the svg canvas", () => {
+    let svg = document.querySelector("svg");
+    let tmp = new SvgPenSketch(svg);
+    svg.innerHTML = `<path d="M10 10"/>`
+    // We have to fake the elementsFromPoint function since this isn't a browser
+    document.elementsFromPoint = (x,y) => {
+        return [document.querySelector("svg path")];
+    };
+    expect(tmp.removePath(0,0)).toBe(true);
+});
+
+test("Try removing a non-existent path from the svg canvas", () => {
+    let tmp = new SvgPenSketch(document.querySelector("svg"));
     // We have to fake the elementsFromPoint function since this isn't a browser
     document.elementsFromPoint = (x,y) => {
         return [];
     };
-    expect(tmp.getPathAtPoint(0,0)).toBe(undefined);
+    expect(tmp.removePath(0,0)).toBe(false);
 });
