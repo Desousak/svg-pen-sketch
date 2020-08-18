@@ -1,6 +1,6 @@
 {
     "name": "svg-pen-sketch",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "An easy-to-use JavaScript library aimed at making it easier to draw on SVG elements when using a digital pen (such as the Surface Pen).",
     "repository": "desousak/svg-pen-sketch",
     "main": "dist/svg-pen-sketch.js",
