@@ -85,6 +85,10 @@ export default class SvgPenSketch {
                 let penCoords = [];
                 let strokePath = this._element.append("path");
 
+                // Generate a random ID for the stroke
+                let strokeID = Math.random().toString(32).substr(2,9);
+                strokePath.attr("id", strokeID);
+
                 // Apply all user-desired styles
                 for (let styleName in this.strokeStyles) {
                     strokePath.style(styleName, this.strokeStyles[styleName]);
