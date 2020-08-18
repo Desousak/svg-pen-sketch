@@ -5,6 +5,10 @@ An easy-to-use JavaScript library aimed at making it easier to draw on SVG eleme
     <img src="https://img.shields.io/npm/v/svg-pen-sketch?style=flat-square">
 </a>
 
+<a href="https://github.com/Desousak/svg-pen-sketch/actions?query=workflow%3A%22Node.js+CI%22">
+    <img src="https://img.shields.io/github/workflow/status/Desousak/svg-pen-sketch/Node.js%20CI?style=flat-square">
+</a>
+
 ## How to use 
 (Importing as a node module)
 ```javascript
