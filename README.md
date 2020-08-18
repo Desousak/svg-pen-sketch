@@ -1,7 +1,9 @@
 # svg-pen-sketch
 An easy-to-use JavaScript library aimed at making it easier to draw on SVG elements when using a digital pen (such as the Surface Pen). 
 
-<img src="https://img.shields.io/npm/v/svg-pen-sketch?style=flat-square">
+<a href="https://www.npmjs.com/package/svg-pen-sketch">
+    <img src="https://img.shields.io/npm/v/svg-pen-sketch?style=flat-square">
+</a>
 
 ## How to use 
 (Importing as a node module)
@@ -67,6 +69,7 @@ canvas.eraserUpCallback = (event) => {};
 
 ## Todo
 - More tests need to be made
+- Try to fix the issue with strokes being cut off if the screen is resized
 - ~~Add some error checking for the element passed in the constructor~~
 - ~~Add some options to change stroke styles~~
 
