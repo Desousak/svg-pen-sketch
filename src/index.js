@@ -16,9 +16,10 @@ export default class SvgPenSketch {
             // Variable for if the pointer event is a pen
             this._isPen = false;
             // Resize the canvas viewbox on window resize
-            window.onresize = _ => {
-                this.resizeCanvas();
-            };
+            // TODO: Need to implement a proper fix to allow paths to scale 
+            // window.onresize = _ => {
+            //     this.resizeCanvas();
+            // };
             // Prep the canvas for drawing
             this._element.on("pointerdown", _ => this._handlePointer());
             // Stop touch scrolling
@@ -43,6 +44,7 @@ export default class SvgPenSketch {
     // Public functions
     getElement() { return this._element.node(); }
 
+    // Not being used at the moment
     resizeCanvas() {
         let bbox = this._element.node().getBoundingClientRect();
         this._element.attr("viewBox", "0 0 " + bbox.width + " " + bbox.height);
@@ -86,7 +88,7 @@ export default class SvgPenSketch {
                 let strokePath = this._element.append("path");
 
                 // Generate a random ID for the stroke
-                let strokeID = Math.random().toString(32).substr(2,9);
+                let strokeID = Math.random().toString(32).substr(2, 9);
                 strokePath.attr("id", strokeID);
 
                 // Apply all user-desired styles
@@ -112,9 +114,16 @@ export default class SvgPenSketch {
 
     _onDraw(strokePath, penCoords) {
         if (d3.event.pointerType != "touch") {
+            let canvasContainer = this.getElement().getBoundingClientRect();
+
+            // Calculate the offset using the page location and the canvas' offset (also taking scroll into account)
+            let x = d3.event.pageX - canvasContainer.x - document.scrollingElement.scrollLeft,
+                y = d3.event.pageY - canvasContainer.y - document.scrollingElement.scrollTop;
+
             // Add the points to the path
-            penCoords.push([d3.event.offsetX, d3.event.offsetY]);
+            penCoords.push([x, y]);
             strokePath.attr('d', this._lineFunc(penCoords));
+            
             // Call the callback
             if (this.penDownCallback != undefined) {
                 this.penDownCallback(strokePath.node(), d3.event);
