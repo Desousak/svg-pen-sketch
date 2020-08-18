@@ -52,7 +52,7 @@ test("Try removing a path from the svg canvas", () => {
     document.elementsFromPoint = (x,y) => {
         return [document.querySelector("svg path")];
     };
-    expect(tmp.removePath(0,0)).toBe(true);
+    expect(tmp.removePath(0,0).nodeType).toBe(1);
 });
 
 test("Try removing a non-existent path from the svg canvas", () => {
@@ -61,5 +61,5 @@ test("Try removing a non-existent path from the svg canvas", () => {
     document.elementsFromPoint = (x,y) => {
         return [];
     };
-    expect(tmp.removePath(0,0)).toBe(false);
+    expect(tmp.removePath(0,0)).toBe(null);
 });

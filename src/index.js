@@ -63,10 +63,11 @@ export default class SvgPenSketch {
         // Removes a stroke at coordinates (x,y) 
         let strokePath = this.getPathAtPoint(x, y);
         if (strokePath != undefined) {
-            d3.select(strokePath).remove();
-            return true;
+            let pathToRemove = d3.select(strokePath);
+            pathToRemove.remove();
+            return pathToRemove.node();
         }
-        return false;
+        return null;
     }
 
     // Private functions
