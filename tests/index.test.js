@@ -32,7 +32,7 @@ test("Try getting a path at (x,y) from the svg canvas", () => {
     document.elementsFromPoint = (x,y) => {
         return [{nodeName : "other"},{nodeName : "path"}];
     };
-    expect(tmp.getPathAtPoint(0,0).nodeName).toBe("path");
+    expect(tmp.getPathsAtPoint(0,0).length).toBe(1);
 });
 
 test("Try getting a non-existent path at (x,y) from the svg canvas", () => {
@@ -41,7 +41,7 @@ test("Try getting a non-existent path at (x,y) from the svg canvas", () => {
     document.elementsFromPoint = (x,y) => {
         return [];
     };
-    expect(tmp.getPathAtPoint(0,0)).toBe(undefined);
+    expect(tmp.getPathsAtPoint(0,0).length).toBe(0);
 });
 
 test("Try removing a path from the svg canvas", () => {
@@ -50,9 +50,9 @@ test("Try removing a path from the svg canvas", () => {
     svg.innerHTML = `<path d="M10 10"/>`
     // We have to fake the elementsFromPoint function since this isn't a browser
     document.elementsFromPoint = (x,y) => {
-        return [document.querySelector("svg path")];
+        return document.querySelectorAll("svg path");
     };
-    expect(tmp.removePath(0,0).nodeType).toBe(1);
+    expect(tmp.removePaths(0,0).length).toBe(1);
 });
 
 test("Try removing a non-existent path from the svg canvas", () => {
@@ -61,5 +61,5 @@ test("Try removing a non-existent path from the svg canvas", () => {
     document.elementsFromPoint = (x,y) => {
         return [];
     };
-    expect(tmp.removePath(0,0)).toBe(null);
+    expect(tmp.removePaths(0,0).length).toBe(0);
 });

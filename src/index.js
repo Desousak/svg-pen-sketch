@@ -50,24 +50,35 @@ export default class SvgPenSketch {
         this._element.attr("viewBox", "0 0 " + bbox.width + " " + bbox.height);
     }
 
-    getPathAtPoint(x, y) {
+    getPathsAtPoint(x, y) {
         // Get any paths at a specified x and y location
         let elements = document.elementsFromPoint(x, y);
+        let paths = [];
         for (let element of elements) {
-            if (element.nodeName === "path") return element;
+            if (element.nodeName === "path") paths.push(element);
         }
-        return undefined;
+        return paths;
     }
 
-    removePath(x, y) {
-        // Removes a stroke at coordinates (x,y) 
-        let strokePath = this.getPathAtPoint(x, y);
-        if (strokePath != undefined) {
-            let pathToRemove = d3.select(strokePath);
-            pathToRemove.remove();
-            return pathToRemove.node();
+    removePaths(x, y, eraserSize = 5) {
+        let removedPathIDs = [];
+        
+        // Iterate through a (eraserSize)x(eraserSize) grid with the mouse-pos as the center
+        for (let i = eraserSize * -1; i <= eraserSize; i++) {
+            for (let j = eraserSize * -1; j <= eraserSize; j++) {
+                let newX = x + i,
+                    newY = y + j;
+
+                // Removes a stroke at coordinates (x,y) 
+                let strokePaths = this.getPathsAtPoint(newX, newY);
+                for (let path of strokePaths) {
+                    let pathToRemove = d3.select(path);
+                    removedPathIDs.push(pathToRemove.attr("id"));
+                    pathToRemove.remove();
+                }
+            }
         }
-        return null;
+        return removedPathIDs;
     }
 
     // Private functions
@@ -98,67 +109,78 @@ export default class SvgPenSketch {
                 }
 
                 // Create the drawing event handlers
-                this._element.on("pointermove", _ => this._onDraw(strokePath, penCoords));
-                this._element.on("pointerup", _ => this._stopDraw(strokePath));
-                this._element.on("pointerleave", _ => this._stopDraw(strokePath));
+                this._element.on("pointermove", _ => this._onDraw(d3.event, strokePath, penCoords));
+                this._element.on("pointerup", _ => this._stopDraw(d3.event, strokePath));
+                this._element.on("pointerleave", _ => this._stopDraw(d3.event, strokePath));
                 break;
 
             // Eraser
             case (5):
                 // Create the erase event handlers
-                this._element.on("pointermove", _ => this._onErase());
-                this._element.on("pointerup", _ => this._stopErase());
-                this._element.on("pointerleave", _ => this._stopErase());
+                this._element.on("pointermove", _ => this._onErase(d3.event));
+                this._element.on("pointerup", _ => this._stopErase(d3.event));
+                this._element.on("pointerleave", _ => this._stopErase(d3.event));
                 break;
         }
     }
 
-    _onDraw(strokePath, penCoords) {
-        if (d3.event.pointerType != "touch") {
-            let canvasContainer = this.getElement().getBoundingClientRect();
+    _getMousePos(event) {
+        let canvasContainer = this.getElement().getBoundingClientRect();
 
-            // Calculate the offset using the page location and the canvas' offset (also taking scroll into account)
-            let x = d3.event.pageX - canvasContainer.x - document.scrollingElement.scrollLeft,
-                y = d3.event.pageY - canvasContainer.y - document.scrollingElement.scrollTop;
+        // Calculate the offset using the page location and the canvas' offset (also taking scroll into account)
+        let x = event.pageX - canvasContainer.x - document.scrollingElement.scrollLeft,
+            y = event.pageY - canvasContainer.y - document.scrollingElement.scrollTop;
+
+        return [x, y];
+    }
+
+    _onDraw(event, strokePath, penCoords) {
+        if (event.pointerType != "touch") {
+            let [x, y] = this._getMousePos(event);
 
             // Add the points to the path
             penCoords.push([x, y]);
             strokePath.attr('d', this._lineFunc(penCoords));
-            
+
             // Call the callback
             if (this.penDownCallback != undefined) {
-                this.penDownCallback(strokePath.node(), d3.event);
+                this.penDownCallback(strokePath.node(), event);
             }
         }
     }
 
-    _stopDraw(strokePath) {
+    _stopDraw(event, strokePath) {
         // Remove the event handlers
         this._element.on("pointermove", null);
         this._element.on("pointerup", null);
         this._element.on("pointerleave", null);
         // Call the callback
         if (this.penUpCallback != undefined) {
-            this.penUpCallback(strokePath.node(), d3.event);
+            this.penUpCallback(strokePath.node(), event);
         }
     }
 
-    _onErase() {
-        // Remove any paths in the way
-        let removedPath = this.removePath(d3.event.pageX, d3.event.pageY);
+    _onErase(event) {
+        if (event.pointerType != "touch") {
+            let [x, y] = this._getMousePos(event);
 
-        if (this.eraserDownCallback != undefined) {
-            this.eraserDownCallback(removedPath, d3.event);
+            // Remove any paths in the way
+            let removedPaths = this.removePaths(x, y);
+
+            if (this.eraserDownCallback != undefined) {
+                this.eraserDownCallback(removedPaths, event);
+            }
         }
     }
 
-    _stopErase() {
+    _stopErase(event) {
+        // Remove the event handlers
         this._element.on("pointermove", null);
         this._element.on("pointerup", null);
         this._element.on("pointerleave", null);
-
+        // Call the callback
         if (this.eraserUpCallback != undefined) {
-            this.eraserUpCallback(d3.event);
+            this.eraserUpCallback(event);
         }
     }
 }

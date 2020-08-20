@@ -30,7 +30,7 @@ canvas.penDownCallback = (path, event) => {};
 canvas.penUpCallback = (path, event) => {};
 
 // Same can be done for the eraser end of a pen (if it has one)
-canvas.eraserDownCallback = (removedPath, event) => {};
+canvas.eraserDownCallback = (removedPaths, event) => {};
 canvas.eraserUpCallback = (event) => {};
 ```
 
@@ -58,7 +58,7 @@ canvas.eraserUpCallback = (event) => {};
         canvas.penUpCallback = (path, event) => {};
 
         // Same can be done for the eraser end of a pen (if it has one)
-        canvas.eraserDownCallback = (removedPath, event) => {};
+        canvas.eraserDownCallback = (removedPaths, event) => {};
         canvas.eraserUpCallback = (event) => {};
     </script>
 </body>

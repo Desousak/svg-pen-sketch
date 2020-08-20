@@ -17,7 +17,11 @@
             return color;
         }
 
-        let strokeAmnt = 0; // Stroke counter
+        function updateStrokeAmnt() {
+            let strokeAmnt = document.querySelectorAll("path").length;
+            document.querySelector("#stroke-count").innerHTML = strokeAmnt;
+        }
+
         window.onload = _ => {
             try {
                 let svgSketch = SvgPenSketch.default;
@@ -34,24 +38,23 @@
                     // Console log the pointer location
                     console.log(`Pointer location = (${event.offsetX},${event.offsetY}) @ ${event.timeStamp}`);
                 };
-                canvas.penUpCallback = (path, event) => {
-                    // Update the stroke count and text
-                    strokeAmnt++;
-                    document.querySelector("#stroke-count").innerHTML = strokeAmnt;
-                    console.log("Pointer left");
-                };
+                canvas.eraserDownCallback = (removedPaths, event) => {
+                    if (removedPaths.length > 0)
+                        console.log("Removed strokes");
+                }
+                canvas.penUpCallback = updateStrokeAmnt;
+                canvas.eraserUpCallback = updateStrokeAmnt;
             } catch (err) {
                 // Display error text 
                 let textElement = document.querySelector("text:nth-child(2)");
                 textElement.innerHTML = `Make sure you built the project for this demo to work`;
                 textElement.setAttribute("font-style", "italic");
-                
+
                 // Update the color randomly
                 setInterval(_ => {
                     console.log("test");
                     textElement.style.fill = getRandomColor();
                 }, 500);
-
             }
         }
     </script>
