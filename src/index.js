@@ -60,21 +60,21 @@ export default class SvgPenSketch {
         return paths;
     }
 
-    removePaths(x, y, eraserSize = 5) {
+    removePaths(x, y, eraserSize = 1) {
         let removedPathIDs = [];
-        
-        // Iterate through a (eraserSize)x(eraserSize) grid with the mouse-pos as the center
-        for (let i = eraserSize * -1; i <= eraserSize; i++) {
-            for (let j = eraserSize * -1; j <= eraserSize; j++) {
-                let newX = x + i,
-                    newY = y + j;
+        eraserSize -= 1;
 
-                // Removes a stroke at coordinates (x,y) 
-                let strokePaths = this.getPathsAtPoint(newX, newY);
-                for (let path of strokePaths) {
-                    let pathToRemove = d3.select(path);
-                    removedPathIDs.push(pathToRemove.attr("id"));
-                    pathToRemove.remove();
+        if (eraserSize >= 0) {
+            // Iterate through a (eraserSize)x(eraserSize) grid with the mouse-pos as the center
+            for (let newX = x - eraserSize; newX <= x + eraserSize; newX++) {
+                for (let newY = y - eraserSize; newY <= y + eraserSize; newY++) {
+                    // Removes a stroke at coordinates (x,y) 
+                    let strokePaths = this.getPathsAtPoint(newX, newY);
+                    for (let path of strokePaths) {
+                        let pathToRemove = d3.select(path);
+                        removedPathIDs.push(pathToRemove.attr("id"));
+                        pathToRemove.remove();
+                    }
                 }
             }
         }
@@ -162,10 +162,12 @@ export default class SvgPenSketch {
 
     _onErase(event) {
         if (event.pointerType != "touch") {
-            let [x, y] = this._getMousePos(event);
+            let x = event.clientX,
+                y =  event.clientY;
 
             // Remove any paths in the way
-            let removedPaths = this.removePaths(x, y);
+            // TODO: Make this user-customizable 
+            let removedPaths = this.removePaths(x, y, 10);
 
             if (this.eraserDownCallback != undefined) {
                 this.eraserDownCallback(removedPaths, event);

@@ -40,7 +40,7 @@
                 };
                 canvas.eraserDownCallback = (removedPaths, event) => {
                     if (removedPaths.length > 0)
-                        console.log("Removed strokes");
+                        console.log("Removed strokes", removedPaths);
                 }
                 canvas.penUpCallback = updateStrokeAmnt;
                 canvas.eraserUpCallback = updateStrokeAmnt;
