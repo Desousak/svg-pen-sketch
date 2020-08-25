@@ -83,44 +83,44 @@ export default class SvgPenSketch {
 
     // Private functions
     _handlePointer() {
-        // If the pointer is a pen - prevent the touch event
+        // If the pointer is a pen - prevent the touch event and run pointer handling code
         if (d3.event.pointerType == "touch") {
             this._isPen = false;
         } else {
             this._isPen = true;
-        }
 
-        // Determine if the pen tip or eraser is being used
-        switch (d3.event.button) {
-            // Pen
-            default:
-            case (0):
-                // Create the path/coordinate arrays and set event handlers
-                let penCoords = [];
-                let strokePath = this._element.append("path");
+            // Determine if the pen tip or eraser is being used
+            switch (d3.event.button) {
+                // Pen
+                default:
+                case (0):
+                    // Create the path/coordinate arrays and set event handlers
+                    let penCoords = [];
+                    let strokePath = this._element.append("path");
 
-                // Generate a random ID for the stroke
-                let strokeID = Math.random().toString(32).substr(2, 9);
-                strokePath.attr("id", strokeID);
+                    // Generate a random ID for the stroke
+                    let strokeID = Math.random().toString(32).substr(2, 9);
+                    strokePath.attr("id", strokeID);
 
-                // Apply all user-desired styles
-                for (let styleName in this.strokeStyles) {
-                    strokePath.style(styleName, this.strokeStyles[styleName]);
-                }
+                    // Apply all user-desired styles
+                    for (let styleName in this.strokeStyles) {
+                        strokePath.style(styleName, this.strokeStyles[styleName]);
+                    }
 
-                // Create the drawing event handlers
-                this._element.on("pointermove", _ => this._onDraw(d3.event, strokePath, penCoords));
-                this._element.on("pointerup", _ => this._stopDraw(d3.event, strokePath));
-                this._element.on("pointerleave", _ => this._stopDraw(d3.event, strokePath));
-                break;
+                    // Create the drawing event handlers
+                    this._element.on("pointermove", _ => this._onDraw(d3.event, strokePath, penCoords));
+                    this._element.on("pointerup", _ => this._stopDraw(d3.event, strokePath));
+                    this._element.on("pointerleave", _ => this._stopDraw(d3.event, strokePath));
+                    break;
 
-            // Eraser
-            case (5):
-                // Create the erase event handlers
-                this._element.on("pointermove", _ => this._onErase(d3.event));
-                this._element.on("pointerup", _ => this._stopErase(d3.event));
-                this._element.on("pointerleave", _ => this._stopErase(d3.event));
-                break;
+                // Eraser
+                case (5):
+                    // Create the erase event handlers
+                    this._element.on("pointermove", _ => this._onErase(d3.event));
+                    this._element.on("pointerup", _ => this._stopErase(d3.event));
+                    this._element.on("pointerleave", _ => this._stopErase(d3.event));
+                    break;
+            }
         }
     }
 
@@ -163,7 +163,7 @@ export default class SvgPenSketch {
     _onErase(event) {
         if (event.pointerType != "touch") {
             let x = event.clientX,
-                y =  event.clientY;
+                y = event.clientY;
 
             // Remove any paths in the way
             // TODO: Make this user-customizable 
