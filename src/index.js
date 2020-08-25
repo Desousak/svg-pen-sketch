@@ -28,6 +28,8 @@ export default class SvgPenSketch {
             });
 
             // Public variables
+            // Forces the use of the eraser - even if the pen isn't tilted over
+            this.forceEraser = false;
             // Styles for the stroke
             this.strokeStyles = { ...strokeStyles };
             // Pen Callbacks
@@ -43,6 +45,7 @@ export default class SvgPenSketch {
 
     // Public functions
     getElement() { return this._element.node(); }
+    toggleForcedEraser() { this.forceEraser = !this.forceEraser; }
 
     // Not being used at the moment
     resizeCanvas() {
@@ -89,8 +92,11 @@ export default class SvgPenSketch {
         } else {
             this._isPen = true;
 
+            let pointerButton = d3.event.button;
+            if (this.forceEraser) pointerButton = 5;
+
             // Determine if the pen tip or eraser is being used
-            switch (d3.event.button) {
+            switch (pointerButton) {
                 // Pen
                 default:
                 case (0):

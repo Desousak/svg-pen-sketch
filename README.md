@@ -32,6 +32,10 @@ canvas.penUpCallback = (path, event) => {};
 // Same can be done for the eraser end of a pen (if it has one)
 canvas.eraserDownCallback = (removedPaths, event) => {};
 canvas.eraserUpCallback = (event) => {};
+
+// Toggles the use of the eraser
+// Useful for when certain pens dont support the eraser
+canvas.toggleForcedEraser();
 ```
 
 (Including the source in your project)
@@ -60,6 +64,10 @@ canvas.eraserUpCallback = (event) => {};
         // Same can be done for the eraser end of a pen (if it has one)
         canvas.eraserDownCallback = (removedPaths, event) => {};
         canvas.eraserUpCallback = (event) => {};
+
+        // Toggles the use of the eraser
+        // Useful for when certain pens dont support the eraser
+        canvas.toggleForcedEraser();
     </script>
 </body>
 ```
