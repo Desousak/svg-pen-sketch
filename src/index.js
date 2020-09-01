@@ -26,6 +26,11 @@ export default class SvgPenSketch {
             this._element.on("touchstart", _ => {
                 if (this._isPen) d3.event.preventDefault();
             });
+            // Stop the context menu from appearing
+            this._element.on("contextmenu", _ => {
+                d3.event.preventDefault();
+                d3.event.stopPropagation();
+            });
 
             // Public variables
             // Forces the use of the eraser - even if the pen isn't tilted over
@@ -96,9 +101,9 @@ export default class SvgPenSketch {
             if (this.forceEraser) pointerButton = 5;
 
             // Determine if the pen tip or eraser is being used
+            // ID 0 *should be* the pen tip, with anything else firing the eraser
             switch (pointerButton) {
                 // Pen
-                default:
                 case (0):
                     // Create the path/coordinate arrays and set event handlers
                     let penCoords = [];
@@ -120,6 +125,7 @@ export default class SvgPenSketch {
                     break;
 
                 // Eraser
+                default:
                 case (5):
                     // Create the erase event handlers
                     this._element.on("pointermove", _ => this._onErase(d3.event));
