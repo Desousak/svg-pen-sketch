@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+// Taken from: https://github.com/parcel-bundler/parcel/issues/2896
+// Modifies the bundled code so that it works with JEST 
+const fs = require('fs')
+
+// Path to bundle
+const BUNDLE_PATH = 'dist/svg-pen-sketch.js'
+
+// Read bundle
+const bundle = fs.readFileSync(BUNDLE_PATH, 'utf-8')
+
+// Replace global refs with an isomorphic version
+const processed = bundle.replace(
+  /([^.])parcelRequire/g,
+  '$1(typeof window === \'undefined\' ? global : window).parcelRequire'
+)
+
+// Write bundle
+fs.writeFileSync(BUNDLE_PATH, processed)

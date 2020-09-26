@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-import "./index.css";
 
 export default class SvgPenSketch {
     constructor(element = null, strokeStyles = { "stroke": "black", "stroke-width": "1px" }) {
@@ -36,7 +35,7 @@ export default class SvgPenSketch {
             // Forces the use of the eraser - even if the pen isn't tilted over
             this.forceEraser = false;
             // Styles for the stroke
-            this.strokeStyles = { ...strokeStyles };
+            this.strokeStyles = { ...strokeStyles, "fill": "none" };
             // Pen Callbacks
             this.penDownCallback = _ => { };
             this.penUpCallback = _ => { };

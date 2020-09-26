@@ -45,7 +45,10 @@
                 canvas.penUpCallback = updateStrokeAmnt;
                 canvas.eraserUpCallback = updateStrokeAmnt;
             } catch (err) {
-                // Display error text 
+                // Display the error
+                console.error(err);
+
+                // Show build-suggestion text 
                 let textElement = document.querySelector("text:nth-child(2)");
                 textElement.innerHTML = `Make sure you built the project for this demo to work`;
                 textElement.setAttribute("font-style", "italic");
