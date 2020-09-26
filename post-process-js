@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // Taken from: https://github.com/parcel-bundler/parcel/issues/2896
+// Modifies the bundled code so that it works with JEST 
 const fs = require('fs')
 
 // Path to bundle
