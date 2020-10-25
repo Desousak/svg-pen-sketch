@@ -1,17 +1,27 @@
 import * as d3 from "d3";
+import MathExtas from "./MathExtras.js"
+import PathExtras from "./PathExtras.js";
+
+// Default settings
+const defStrokeParam = {
+    // Line function for drawing (must convert coordinates to a valid path string)
+    "lineFunc": PathExtras.coordsToPath,
+    // Minimum distance between points before the stroke is updated
+    "minDist": 5
+}
+
+const defStrokeStyles = { 
+    "stroke": "black", 
+    "stroke-width": "1px" 
+}
 
 export default class SvgPenSketch {
-    constructor(element = null, strokeStyles = { "stroke": "black", "stroke-width": "1px" }) {
+    constructor(element = null, strokeStyles = {}, strokeParam = {}) {
         // If the element is a valid 
         if (element != null && typeof (element) === "object" && element.nodeType) {
             // Private variables
             // The root SVG element
             this._element = d3.select(element);
-            // Line function for drawing
-            this._lineFunc = d3.line()
-                .x((d) => d[0])
-                .y((d) => d[1])
-                .curve(d3.curveBasis);
             // Variable for if the pointer event is a pen
             this._isPen = false;
             // Resize the canvas viewbox on window resize
@@ -34,8 +44,10 @@ export default class SvgPenSketch {
             // Public variables
             // Forces the use of the eraser - even if the pen isn't tilted over
             this.forceEraser = false;
+            // Stroke parameters
+            this.strokeParam = { ...defStrokeParam, ...strokeParam };
             // Styles for the stroke
-            this.strokeStyles = { ...strokeStyles, "fill": "none" };
+            this.strokeStyles = { ...defStrokeStyles, ...strokeStyles, "fill": "none" };
             // Pen Callbacks
             this.penDownCallback = _ => { };
             this.penUpCallback = _ => { };
@@ -147,11 +159,21 @@ export default class SvgPenSketch {
 
     _onDraw(event, strokePath, penCoords) {
         if (event.pointerType != "touch") {
+            let updt_stroke = true;
             let [x, y] = this._getMousePos(event);
 
-            // Add the points to the path
-            penCoords.push([x, y]);
-            strokePath.attr('d', this._lineFunc(penCoords));
+            if (penCoords.length > 0) {
+                // Get the distance from the last coordinates, if the distance is too small - dont update the stroke
+                let [lastX, lastY] = penCoords.slice(-1)[0];
+                let dist = MathExtas.getDist(lastX, lastY, x, y);
+                if (dist < this.strokeParam.minDist) updt_stroke = false;
+            }
+
+            if (updt_stroke) {
+                // Add the points to the path
+                penCoords.push([x, y]);
+                strokePath.attr('d', this.strokeParam.lineFunc(penCoords));
+            }
 
             // Call the callback
             if (this.penDownCallback != undefined) {
