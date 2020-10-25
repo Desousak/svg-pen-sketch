@@ -80,7 +80,7 @@ canvas.toggleForcedEraser();
 ### Stroke Styles:
 - Any CSS style can be applied by adding the style name, and value, in the `strokeStyles` object
 ### Stroke Parameters:
-- `lineFunc`: The screen coordinate to SVG Path function - can be overwritten to introduce functionality such as the use of splines (the function is given a array of coordinates)
+- `lineFunc`: The screen coordinate to SVG Path function - can be overwritten to introduce functionality such as the use of splines (the function is given an array of coordinates)
 - `minDist`: The minimum distance between the last and current points before the stroke is updated (can be increased to improve performance on weaker devices)
 
 ## Build Instructions
