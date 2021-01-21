@@ -80,8 +80,9 @@ canvas.toggleForcedEraser();
 ### Stroke Styles:
 - Any CSS style can be applied by adding the style name, and value, in the `strokeStyles` object
 ### Stroke Parameters:
-- `lineFunc`: The screen coordinate to SVG Path function - can be overwritten to introduce functionality such as the use of splines (the function is given an array of coordinates)
-- `minDist`: The minimum distance between the last and current points before the stroke is updated (can be increased to improve performance on weaker devices)
+- `lineFunc`: A function that converts screen coordinates to an SVG Path - can be overwritten to introduce functionality such as the use of splines (various other D3 curve functions can be found <a href="http://bl.ocks.org/d3indepth/b6d4845973089bc1012dec1674d3aff8">here</a>)
+
+- `minDist`: The minimum distance between the last and current point(s) before the stroke is updated (can be increased to improve performance on weaker devices)
 
 ## Build Instructions
 1) Clone the repository and run `npm install`
