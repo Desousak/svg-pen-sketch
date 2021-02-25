@@ -32,7 +32,7 @@ export default class SvgPenSketch {
     strokeStyles = {},
     strokeParam = {},
     eraserParam = {},
-    eraserStyles = {},
+    eraserStyles = {}
   ) {
     // If the element is a valid
     if (element != null && typeof element === "object" && element.nodeType) {
@@ -96,43 +96,60 @@ export default class SvgPenSketch {
     this._element.attr("viewBox", "0 0 " + bbox.width + " " + bbox.height);
   }
 
-  getPathsAtPoint(x, y) {
-    // Get any paths at a specified x and y location
-    let elements = document.elementsFromPoint(x, y);
+  getPathsAtPoint(x1, y1, x2, y2) {
     let paths = [];
-    for (let element of elements) {
-      if (element.nodeName === "path") paths.push(element);
+
+    // Iterate through the specified range
+    for (let x = x1; x <= x2; x += 1) {
+      for (let y = y1; y <= y2; y += 1) {
+        // Get any paths at a specified x and y location
+        let elements = document.elementsFromPoint(x, y);
+        for (let element of elements) {
+          if (element.nodeName === "path" && !paths.includes(element))
+            paths.push(element);
+        }
+      }
     }
     return paths;
   }
 
   removePaths(x, y, eraserSize = 1) {
+    // Prep variables
     let removedPathIDs = [];
-    eraserSize -= 1;
+    let xLowerBounds = x - eraserSize,
+      xUpperBounds = x + eraserSize,
+      yLowerBounds = y - eraserSize,
+      yUpperBounds = y + eraserSize;
 
-    if (eraserSize >= 0) {
-      // Iterate through a (eraserSize)x(eraserSize) grid with the mouse-pos as the center
-      for (let newX = xLowerBounds; newX <= xUpperBounds; newX++) {
-        for (let newY = yLowerBounds; newY <= yUpperBounds; newY++) {
-          // Removes a stroke at coordinates (x,y)
-          let strokePaths = this.getPathsAtPoint(newX, newY);
-          for (let path of strokePaths) {
-            let pathToRemove = d3.select(path);
-            removedPathIDs.push(pathToRemove.attr("id"));
-            pathToRemove.remove();
-          }
-        }
-      }
+    // Get paths in the eraser's range
+    let paths = this.getPathsAtPoint(
+      xLowerBounds,
+      yLowerBounds,
+      xUpperBounds,
+      yUpperBounds
+    );
+
+    // For each path found, remove it 
+    for (let path of paths) {
+      let pathToRemove = d3.select(path);
+      removedPathIDs.push(pathToRemove.attr("id"));
+      pathToRemove.remove();
     }
     return removedPathIDs;
   }
 
   editPaths(x, y, eraserSize = 1) {
-    let paths = this.getPathsAtPoint(x, y);
     let xLowerBounds = x - eraserSize,
       xUpperBounds = x + eraserSize,
       yLowerBounds = y - eraserSize,
       yUpperBounds = y + eraserSize;
+
+    let paths = this.getPathsAtPoint(
+      xLowerBounds,
+      yLowerBounds,
+      xUpperBounds,
+      yUpperBounds
+    );
 
     for (let originalPath of paths) {
       let pathCoords = PathExtras.pathToCoords(originalPath.getAttribute("d"));
@@ -218,12 +235,15 @@ export default class SvgPenSketch {
         default:
         case 5:
           // Create the location arrays
-          let eraserCoords = [];
+          let [x, y] = this._getMousePos(d3.event);
+          let eraserCoords = [[x, y]];
 
           // Prep the eraser hover element
           let eraserHandle = this._element.append("circle");
-          eraserHandle.attr("r", 10);
           eraserHandle.attr("class", "eraserHandle");
+          eraserHandle.attr("r", 10);
+          eraserHandle.attr("cx", x);
+          eraserHandle.attr("cy", y);
 
           // Apply all user-desired styles
           for (let styleName in this.eraserStyles) {
@@ -316,12 +336,10 @@ export default class SvgPenSketch {
       eraserHandle.attr("cx", x);
       eraserHandle.attr("cy", y);
 
-      if (eraserCoords.length > 0) {
-        // Get the distance from the last coordinates, if the distance is too small - dont update the stroke
-        let [lastX, lastY] = eraserCoords.slice(-1)[0];
-        let dist = MathExtas.getDist(lastX, lastY, x, y);
-        if (dist < this.eraserParam.minDist) updateEraser = false;
-      }
+      // Get the distance from the last coordinates, if the distance is too small - dont update the stroke
+      let [lastX, lastY] = eraserCoords.slice(-1)[0];
+      let dist = MathExtas.getDist(lastX, lastY, x, y);
+      if (dist < this.eraserParam.minDist) updateEraser = false;
 
       if (updateEraser) {
         // Add the points
