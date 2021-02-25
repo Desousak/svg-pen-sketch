@@ -14,18 +14,16 @@ An easy-to-use JavaScript library aimed at making it easier to draw on SVG eleme
 ```javascript
 import svgSketch from "svg-pen-sketch";
 
-// Prep the svg element to be drawn on (custom path styles and parameters can be passed in optionally)
+// Prep the svg element to be drawn on (custom path styles can be passed in optionally)
 const strokeStyle =  {"stroke": "red", "stroke-width": "10px"};
-const strokeParam = {"lineFunc": (points) => {return "M0 0 L1 1 L2 2"}, "minDist": 10};
-const canvas = new svgSketch(document.querySelector("svg"), strokeStyle, strokeParam);
+const canvas = new svgSketch(document.querySelector("svg"), strokeStyle);
 
 // The svg element that is being used can be returned with getElement()
 canvas.getElement();
 
-// The parameters of the paths can be updated by updating their respective objects
+// The styling of the paths can be updated by updating the strokeStyles object
 // NOTE: This will only affect new strokes drawn
 canvas.strokeStyles = {"stroke": "black", "stroke-width": "1px"};
-canvas.strokeParam = {"lineFunc": (points) => {return "M100 100 L0 0 L50 50"}, "minDist": 0};
 
 // Callbacks can be set for various events
 canvas.penDownCallback = (path, event) => {};
@@ -48,18 +46,16 @@ canvas.toggleForcedEraser();
     <script> 
         let svgSketch = SvgPenSketch.default;
 
-        // Prep the svg element to be drawn on (custom path styles and parameters can be passed in optionally)
+        // Prep the svg element to be drawn on (custom path styles can be passed in optionally)
         const strokeStyle =  {"stroke": "red", "stroke-width": "10px"};
-        const strokeParam = {"lineFunc": (points) => {return "M0 0 L1 1 L2 2"}, "minDist": 10};
-        const canvas = new svgSketch(document.querySelector("svg"), strokeStyle, strokeParam);
+        const canvas = new svgSketch(document.querySelector("svg"), strokeStyle);
 
         // The svg element that is being used can be returned with getElement()
         canvas.getElement();
 
-        // The parameters of the paths can be updated by updating their respective objects
+        // The styling of the paths can be updated by updating the strokeStyles object
         // NOTE: This will only affect new strokes drawn
         canvas.strokeStyles = {"stroke": "black", "stroke-width": "1px"};
-        canvas.strokeParam = {"lineFunc": (points) => {return "M100 100 L0 0 L50 50"}, "minDist": 0};
 
         // Callbacks can be set for various events
         canvas.penDownCallback = (path, event) => {};
@@ -75,14 +71,6 @@ canvas.toggleForcedEraser();
     </script>
 </body>
 ```
-
-## Parameters:
-### Stroke Styles:
-- Any CSS style can be applied by adding the style name, and value, in the `strokeStyles` object
-### Stroke Parameters:
-- `lineFunc`: A function that converts screen coordinates to an SVG Path - can be overwritten to introduce functionality such as the use of splines (various other D3 curve functions can be found <a href="http://bl.ocks.org/d3indepth/b6d4845973089bc1012dec1674d3aff8">here</a>)
-
-- `minDist`: The minimum distance between the last and current point(s) before the stroke is updated (can be increased to improve performance on weaker devices)
 
 ## Build Instructions
 1) Clone the repository and run `npm install`
