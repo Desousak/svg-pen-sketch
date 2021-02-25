@@ -12,7 +12,7 @@ const defStrokeParam = {
 
 const defEraserParam = {
   eraserMode: "pixel",
-  minDist: 5,
+  eraserSize: 10, // NOTE: Small eraser sizes will cause skipping isses - will need to be fixed
 };
 
 const defStrokeStyles = {
@@ -129,7 +129,7 @@ export default class SvgPenSketch {
       yUpperBounds
     );
 
-    // For each path found, remove it 
+    // For each path found, remove it
     for (let path of paths) {
       let pathToRemove = d3.select(path);
       removedPathIDs.push(pathToRemove.attr("id"));
@@ -241,9 +241,12 @@ export default class SvgPenSketch {
           // Prep the eraser hover element
           let eraserHandle = this._element.append("circle");
           eraserHandle.attr("class", "eraserHandle");
-          eraserHandle.attr("r", 10);
+          eraserHandle.attr("r", this.eraserParam.eraserSize / 2);
           eraserHandle.attr("cx", x);
           eraserHandle.attr("cy", y);
+
+          // Hide the mouse cursor
+          this._element.style("cursor", "none");
 
           // Apply all user-desired styles
           for (let styleName in this.eraserStyles) {
@@ -339,7 +342,7 @@ export default class SvgPenSketch {
       // Get the distance from the last coordinates, if the distance is too small - dont update the stroke
       let [lastX, lastY] = eraserCoords.slice(-1)[0];
       let dist = MathExtas.getDist(lastX, lastY, x, y);
-      if (dist < this.eraserParam.minDist) updateEraser = false;
+      if (dist < this.eraserParam.eraserSize) updateEraser = false;
 
       if (updateEraser) {
         // Add the points
@@ -348,10 +351,14 @@ export default class SvgPenSketch {
         switch (this.eraserParam.eraserMode) {
           case "stroke":
             // Remove any paths in the way
-            let removedPaths = this.removePaths(x, y, 10);
+            let removedPaths = this.removePaths(
+              x,
+              y,
+              this.eraserParam.eraserSize
+            );
             break;
           case "pixel":
-            this.editPaths(x, y, 10);
+            this.editPaths(x, y, this.eraserParam.eraserSize);
             break;
           default:
             console.error("ERROR: INVALID ERASER MODE");
@@ -366,8 +373,9 @@ export default class SvgPenSketch {
   }
 
   _stopErase(event, eraserHandle) {
-    // Remove the eraser icon
+    // Remove the eraser icon and add the cursor
     eraserHandle.remove();
+    this._element.style("cursor", null);
 
     // Remove the event handlers
     this._element.on("pointermove", null);
