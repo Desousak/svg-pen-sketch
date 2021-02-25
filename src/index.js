@@ -224,10 +224,10 @@ export default class SvgPenSketch {
             this._onDraw(d3.event, strokePath, penCoords)
           );
           this._element.on("pointerup", (_) =>
-            this._stopDraw(d3.event, strokePath)
+            this._stopDraw(d3.event, strokePath, penCoords)
           );
           this._element.on("pointerleave", (_) =>
-            this._stopDraw(d3.event, strokePath)
+            this._stopDraw(d3.event, strokePath, penCoords)
           );
           break;
 
@@ -319,11 +319,48 @@ export default class SvgPenSketch {
     }
   }
 
-  _stopDraw(event, strokePath) {
+  _stopDraw(event, strokePath, penCoords) {
     // Remove the event handlers
     this._element.on("pointermove", null);
     this._element.on("pointerup", null);
     this._element.on("pointerleave", null);
+
+    // Fill in the path if there are missing nodes
+    let newPath = [];
+    for (let i = 0; i <= penCoords.length - 2; i++) {
+      // Get the current and next coordinates
+      let currCoords = penCoords[i];
+      let nextCoords = penCoords[i + 1];
+      newPath.push(currCoords);
+
+      // If the distance to the next coord is too large, interpolate between
+      let dist = MathExtas.getDist(
+        currCoords[0],
+        currCoords[1],
+        nextCoords[0],
+        nextCoords[1]
+      );
+      if (dist > this.strokeParam.minDist * 2) {
+        // Calculate how many interpolated samples we need
+        let step = Math.floor(dist / this.strokeParam.minDist) + 1;
+        // Loop through the interpolated samples needed - adding new coordinates
+        for (let j = dist / step / dist; j < 1; j += dist / step / dist) {
+          newPath.push([
+            MathExtas.lerp(currCoords[0], nextCoords[0], j),
+            MathExtas.lerp(currCoords[1], nextCoords[1], j),
+          ]);
+        }
+      }
+
+      // Add the final path
+      if (i == penCoords.length - 2) {
+        newPath.push(nextCoords);
+      }
+    }
+
+    // Update the stroke
+    strokePath.attr("d", PathExtras.coordsToPath(newPath));
+
     // Call the callback
     if (this.penUpCallback != undefined) {
       this.penUpCallback(strokePath.node(), event);
