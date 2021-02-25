@@ -12,6 +12,7 @@ const defStrokeParam = {
 
 const defEraserParam = {
   eraserMode: "pixel",
+  minDist: 5,
 };
 
 const defStrokeStyles = {
@@ -19,12 +20,19 @@ const defStrokeStyles = {
   "stroke-width": "1px",
 };
 
+const defEraserStyles = {
+  "pointer-events": "none",
+  "z-index": 999,
+  fill: "rgba(0,0,0, 0.5)",
+};
+
 export default class SvgPenSketch {
   constructor(
     element = null,
     strokeStyles = {},
     strokeParam = {},
-    eraserParam = {}
+    eraserParam = {},
+    eraserStyles = {},
   ) {
     // If the element is a valid
     if (element != null && typeof element === "object" && element.nodeType) {
@@ -59,6 +67,8 @@ export default class SvgPenSketch {
       this.strokeStyles = { ...defStrokeStyles, ...strokeStyles, fill: "none" };
       // Eraser paraneters
       this.eraserParam = { ...defEraserParam, ...eraserParam };
+      // Styles for the Eraser
+      this.eraserStyles = { ...defEraserStyles, ...eraserStyles };
       // Pen Callbacks
       this.penDownCallback = (_) => {};
       this.penUpCallback = (_) => {};
@@ -207,10 +217,29 @@ export default class SvgPenSketch {
         // Eraser
         default:
         case 5:
+          // Create the location arrays
+          let eraserCoords = [];
+
+          // Prep the eraser hover element
+          let eraserHandle = this._element.append("circle");
+          eraserHandle.attr("r", 10);
+          eraserHandle.attr("class", "eraserHandle");
+
+          // Apply all user-desired styles
+          for (let styleName in this.eraserStyles) {
+            eraserHandle.style(styleName, this.eraserStyles[styleName]);
+          }
+
           // Create the erase event handlers
-          this._element.on("pointermove", (_) => this._onErase(d3.event));
-          this._element.on("pointerup", (_) => this._stopErase(d3.event));
-          this._element.on("pointerleave", (_) => this._stopErase(d3.event));
+          this._element.on("pointermove", (_) =>
+            this._onErase(d3.event, eraserHandle, eraserCoords)
+          );
+          this._element.on("pointerup", (_) =>
+            this._stopErase(d3.event, eraserHandle)
+          );
+          this._element.on("pointerleave", (_) =>
+            this._stopErase(d3.event, eraserHandle)
+          );
           break;
       }
     }
@@ -244,17 +273,17 @@ export default class SvgPenSketch {
 
   _onDraw(event, strokePath, penCoords) {
     if (event.pointerType != "touch") {
-      let updt_stroke = true;
+      let updateStroke = true;
       let [x, y] = this._getMousePos(event);
 
       if (penCoords.length > 0) {
         // Get the distance from the last coordinates, if the distance is too small - dont update the stroke
         let [lastX, lastY] = penCoords.slice(-1)[0];
         let dist = MathExtas.getDist(lastX, lastY, x, y);
-        if (dist < this.strokeParam.minDist) updt_stroke = false;
+        if (dist < this.strokeParam.minDist) updateStroke = false;
       }
 
-      if (updt_stroke) {
+      if (updateStroke) {
         // Add the points to the path
         penCoords.push([x, y]);
         strokePath.attr("d", this.strokeParam.lineFunc(penCoords));
@@ -278,30 +307,38 @@ export default class SvgPenSketch {
     }
   }
 
-  _onErase(event) {
+  _onErase(event, eraserHandle, eraserCoords) {
     if (event.pointerType != "touch") {
-      let x = event.clientX,
-        y = event.clientY;
+      let updateEraser = true;
+      let [x, y] = this._getMousePos(event);
 
-      console.log("Test");
-      let test = this._element.append("circle");
-      console.log(x,y);
-      test.attr("cx", x);
-      test.attr("cy", y);
-      test.attr("r", 1);
-      test.attr("fill", "red");
+      // Move the eraser icon
+      eraserHandle.attr("cx", x);
+      eraserHandle.attr("cy", y);
 
-      switch (this.eraserParam.eraserMode) {
-        case "stroke":
-          // Remove any paths in the way
-          let removedPaths = this.removePaths(x, y, 10);
-          break;
-        case "pixel":
-          this.editPaths(x, y, 10);
-          break;
-        default:
-          console.error("ERROR: INVALID ERASER MODE");
-          break;
+      if (eraserCoords.length > 0) {
+        // Get the distance from the last coordinates, if the distance is too small - dont update the stroke
+        let [lastX, lastY] = eraserCoords.slice(-1)[0];
+        let dist = MathExtas.getDist(lastX, lastY, x, y);
+        if (dist < this.eraserParam.minDist) updateEraser = false;
+      }
+
+      if (updateEraser) {
+        // Add the points
+        eraserCoords.push([x, y]);
+
+        switch (this.eraserParam.eraserMode) {
+          case "stroke":
+            // Remove any paths in the way
+            let removedPaths = this.removePaths(x, y, 10);
+            break;
+          case "pixel":
+            this.editPaths(x, y, 10);
+            break;
+          default:
+            console.error("ERROR: INVALID ERASER MODE");
+            break;
+        }
       }
 
       if (this.eraserDownCallback != undefined) {
@@ -310,7 +347,10 @@ export default class SvgPenSketch {
     }
   }
 
-  _stopErase(event) {
+  _stopErase(event, eraserHandle) {
+    // Remove the eraser icon
+    eraserHandle.remove();
+
     // Remove the event handlers
     this._element.on("pointermove", null);
     this._element.on("pointerup", null);
