@@ -1,17 +1,46 @@
+import { path } from "d3";
+
 function coordsToPath(points) {
-    // Function to reduce the points into a string
-    let pathReduceFn = ( acc, cur )  => {return `${acc} L${cur[0]} ${cur[1]}`};
+  let pathStr = "";
 
-    // Add all the paths
-    let pathStr = points.reduce(pathReduceFn, "");
+  for (let point of points) {
+    if (pathStr == "") {
+      pathStr += "M";
+    } else {
+      pathStr += "L";
+    }
+    pathStr += `${point[0]} ${point[1]} `;
+  }
 
-    // Replace the first "L" in the string with a M and return the string
-    return pathStr.replace("L", "M");
+  return pathStr.trim();
+}
+
+function pathToCoords(pathStr) {
+  let commands = pathStr.split(/(?=[LMC])/);
+  let points = commands.map(function (point) {
+    if (point !== " ") {
+      // If the string doesn't have a space at the end, add it
+      // Usefule for the last coords
+      if (point[point.length - 1] != " ") {
+        point += " ";
+      }
+
+      // Trim the path string and convert it
+      let coords = point.slice(1, -1).split(" ");
+
+      // Convert the coords to a float
+      coords[0] = parseFloat(coords[0]);
+      coords[1] = parseFloat(coords[1]);
+      return coords;
+    }
+  });
+  return points;
 }
 
 const PathExtras = {
-    coordsToPath: coordsToPath
-}
+  coordsToPath: coordsToPath,
+  pathToCoords: pathToCoords,
+};
 
 Object.freeze(PathExtras);
 export default PathExtras;
