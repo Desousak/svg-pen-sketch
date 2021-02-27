@@ -99,7 +99,7 @@ export default class SvgPenSketch {
 
   getPathsAtPoint(x1, y1, x2, y2) {
     let paths = [];
-    
+
     for (let path of this._element.node().querySelectorAll("path")) {
       // Get the bounding boxes for all elements on page
       let bbox = PathExtras.getCachedBoundingClientRect(path);
@@ -199,7 +199,7 @@ export default class SvgPenSketch {
           // Copy the styles of the original stroke
           strokePath.attr("d", PathExtras.coordsToPath(newPath));
           strokePath.attr("style", originalPath.getAttribute("style"));
-          strokePath.attr("class", originalPath.className);
+          strokePath.attr("class", originalPath.getAttribute("class"));
         }
       }
 
