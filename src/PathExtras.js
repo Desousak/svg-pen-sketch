@@ -37,9 +37,18 @@ function pathToCoords(pathStr) {
   return points;
 }
 
+function getCachedBoundingClientRect(ele) {
+  if (!ele._boundingClientRect) {
+    console.log("Caching bounding client...");
+    ele._boundingClientRect = ele.getBoundingClientRect();
+  }
+  return ele._boundingClientRect;
+}
+
 const PathExtras = {
   coordsToPath: coordsToPath,
   pathToCoords: pathToCoords,
+  getCachedBoundingClientRect: getCachedBoundingClientRect,
 };
 
 Object.freeze(PathExtras);

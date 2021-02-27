@@ -7,7 +7,8 @@ const defStrokeParam = {
   // Line function for drawing (must convert coordinates to a valid path string)
   lineFunc: PathExtras.coordsToPath,
   // Minimum distance between points before the stroke is updated
-  minDist: 5,
+  minDist: 4,
+  maxDist: 10,
 };
 
 const defEraserParam = {
@@ -99,17 +100,22 @@ export default class SvgPenSketch {
   getPathsAtPoint(x1, y1, x2, y2) {
     let paths = [];
 
-    // Iterate through the specified range
-    for (let x = x1; x <= x2; x += 1) {
-      for (let y = y1; y <= y2; y += 1) {
-        // Get any paths at a specified x and y location
-        let elements = document.elementsFromPoint(x, y);
-        for (let element of elements) {
-          if (element.nodeName === "path" && !paths.includes(element))
-            paths.push(element);
-        }
+    for (let path of this._element.node().querySelectorAll("path")) {
+      let bbox = PathExtras.getCachedBoundingClientRect(path);
+
+      if (
+        !(
+          bbox.x > x2 ||
+          bbox.y > y2 ||
+          x1 > bbox.x + bbox.width ||
+          y1 > bbox.y + bbox.height
+        ) &&
+        !paths.includes(path)
+      ) {
+        paths.push(path);
       }
     }
+    console.log(paths);
     return paths;
   }
 
@@ -221,13 +227,13 @@ export default class SvgPenSketch {
 
           // Create the drawing event handlers
           this._element.on("pointermove", (_) =>
-            this._onDraw(d3.event, strokePath, penCoords)
+            this.handleDownEvent((_) => this._onDraw(strokePath, penCoords))
           );
           this._element.on("pointerup", (_) =>
-            this._stopDraw(d3.event, strokePath, penCoords)
+            this.handleUpEvent((_) => this._stopDraw(strokePath, penCoords))
           );
           this._element.on("pointerleave", (_) =>
-            this._stopDraw(d3.event, strokePath, penCoords)
+            this.handleUpEvent((_) => this._stopDraw(strokePath, penCoords))
           );
           break;
 
@@ -254,18 +260,96 @@ export default class SvgPenSketch {
           }
 
           // Create the erase event handlers
-          this._element.on("pointermove", (_) =>
-            this._onErase(d3.event, eraserHandle, eraserCoords)
-          );
+          this._element.on("pointermove", (_) => {
+            this.handleDownEvent((_) =>
+              this._onErase(eraserHandle, eraserCoords)
+            );
+          });
           this._element.on("pointerup", (_) =>
-            this._stopErase(d3.event, eraserHandle)
+            this.handleUpEvent((_) => this._stopErase(eraserHandle))
           );
           this._element.on("pointerleave", (_) =>
-            this._stopErase(d3.event, eraserHandle)
+            this.handleUpEvent((_) => this._stopErase(eraserHandle))
           );
           break;
       }
     }
+  }
+
+  // Creates a new pointer event that can be modified
+  createEvent() {
+    let newEvent = {};
+    let features = [
+      "clientX",
+      "clientY",
+      "offsetX",
+      "offsetY",
+      "pageX",
+      "pageY",
+      "pointerType",
+      "pressure",
+      "movementX",
+      "movementY",
+      "tiltX",
+      "tiltY",
+      "twistX",
+      "twistY",
+      "timeStamp",
+    ];
+
+    for (let feat of features) {
+      newEvent[feat] = d3.event[feat];
+    }
+    return newEvent;
+  }
+
+  // Handles the creation of this._currPointerEvent and this._prevPointerEvent
+  // Also interpolates between samples if needed
+  handleDownEvent(callback) {
+    let dist = Math.sqrt(
+      Math.pow(d3.event.movementX, 2) + Math.pow(d3.event.movementY, 2)
+    );
+
+    if (this._prevPointerEvent && dist > this.strokeParam.maxDist * 2) {
+      // Calculate how many interpolated samples we need
+      let numSteps = Math.floor(dist / this.strokeParam.maxDist) + 1;
+      let step = dist / numSteps / dist;
+
+      // For each step
+      for (let i = step; i < 1; i += step) {
+        // Make a new event based on the current event
+        let newEvent = this.createEvent();
+        for (let feat in newEvent) {
+          // For every feature (that is a number)
+          if (!isNaN(parseFloat(newEvent[feat]))) {
+            // Linearly interpolate it
+            newEvent[feat] = MathExtas.lerp(
+              this._prevPointerEvent[feat],
+              d3.event[feat],
+              i
+            );
+          }
+        }
+        // Set it and call the callback
+        this._currPointerEvent = newEvent;
+        callback();
+      }
+    }
+
+    // Call the proper callback with the "real" event
+    this._currPointerEvent = d3.event;
+    callback();
+    this._prevPointerEvent = this._currPointerEvent;
+  }
+
+  handleUpEvent(callback) {
+    // Run the up callback
+    this._currPointerEvent = this.createEvent();
+    callback();
+
+    // Cleanup the previous pointer events
+    this._prevPointerEvent = null;
+    this._currPointerEvent = null;
   }
 
   _createPath() {
@@ -294,37 +378,22 @@ export default class SvgPenSketch {
     return [x, y];
   }
 
-  _onDraw(event, strokePath, penCoords) {
-    if (event.pointerType != "touch") {
-      let updateStroke = true;
-      let [x, y] = this._getMousePos(event);
+  _onDraw(strokePath, penCoords) {
+    if (this._currPointerEvent.pointerType != "touch") {
+      let [x, y] = this._getMousePos(this._currPointerEvent);
 
-      if (penCoords.length > 0) {
-        // Get the distance from the last coordinates, if the distance is too small - dont update the stroke
-        let [lastX, lastY] = penCoords.slice(-1)[0];
-        let dist = MathExtas.getDist(lastX, lastY, x, y);
-        if (dist < this.strokeParam.minDist) updateStroke = false;
-      }
-
-      if (updateStroke) {
-        // Add the points to the path
-        penCoords.push([x, y]);
-        strokePath.attr("d", this.strokeParam.lineFunc(penCoords));
-      }
+      // Add the points to the path
+      penCoords.push([x, y]);
+      strokePath.attr("d", this.strokeParam.lineFunc(penCoords));
 
       // Call the callback
       if (this.penDownCallback != undefined) {
-        this.penDownCallback(strokePath.node(), event);
+        this.penDownCallback(strokePath.node(), this._currPointerEvent);
       }
     }
   }
 
-  _stopDraw(event, strokePath, penCoords) {
-    // Remove the event handlers
-    this._element.on("pointermove", null);
-    this._element.on("pointerup", null);
-    this._element.on("pointerleave", null);
-
+  _interpolateStroke(strokePath, penCoords) {
     // Fill in the path if there are missing nodes
     let newPath = [];
     for (let i = 0; i <= penCoords.length - 2; i++) {
@@ -342,7 +411,7 @@ export default class SvgPenSketch {
       );
       if (dist > this.strokeParam.minDist * 2) {
         // Calculate how many interpolated samples we need
-        let step = Math.floor(dist / this.strokeParam.minDist) + 1;
+        let step = Math.floor((dist / this.strokeParam.minDist) * 2) + 1;
         // Loop through the interpolated samples needed - adding new coordinates
         for (let j = dist / step / dist; j < 1; j += dist / step / dist) {
           newPath.push([
@@ -360,26 +429,41 @@ export default class SvgPenSketch {
 
     // Update the stroke
     strokePath.attr("d", PathExtras.coordsToPath(newPath));
+  }
+
+  _stopDraw(strokePath, penCoords) {
+    // Remove the event handlers
+    this._element.on("pointermove", null);
+    this._element.on("pointerup", null);
+    this._element.on("pointerleave", null);
+
+    // Interpolate the path if needed
+    this._interpolateStroke(strokePath, penCoords);
+
+    // Cache the element's boundingclientrect
+    // strokePath.attr("boundingClientRect", strokePath.node().getBoundingClientRect());
+    // console.log(strokePath.attr("boundingClientRect"));
 
     // Call the callback
     if (this.penUpCallback != undefined) {
-      this.penUpCallback(strokePath.node(), event);
+      this.penUpCallback(strokePath.node(), this._currPointerEvent);
     }
   }
 
-  _onErase(event, eraserHandle, eraserCoords) {
-    if (event.pointerType != "touch") {
+  _onErase(eraserHandle, eraserCoords) {
+    if (this._currPointerEvent.pointerType != "touch") {
       let updateEraser = true;
-      let [x, y] = this._getMousePos(event);
+      let [x, y] = this._getMousePos(this._currPointerEvent);
 
       // Move the eraser icon
       eraserHandle.attr("cx", x);
       eraserHandle.attr("cy", y);
 
-      // Get the distance from the last coordinates, if the distance is too small - dont update the stroke
+      // Get the distance from the last coordinates, if the distance is too small - dont update the eraser
+      // Prevents multiple events being called at the same spot
       let [lastX, lastY] = eraserCoords.slice(-1)[0];
       let dist = MathExtas.getDist(lastX, lastY, x, y);
-      if (dist < this.eraserParam.eraserSize) updateEraser = false;
+      if (dist < this.eraserParam.eraserSize / 2) updateEraser = false;
 
       if (updateEraser) {
         // Add the points
@@ -404,12 +488,12 @@ export default class SvgPenSketch {
       }
 
       if (this.eraserDownCallback != undefined) {
-        this.eraserDownCallback([], event);
+        this.eraserDownCallback([], this._currPointerEvent);
       }
     }
   }
 
-  _stopErase(event, eraserHandle) {
+  _stopErase(eraserHandle) {
     // Remove the eraser icon and add the cursor
     eraserHandle.remove();
     this._element.style("cursor", null);
@@ -420,7 +504,7 @@ export default class SvgPenSketch {
     this._element.on("pointerleave", null);
     // Call the callback
     if (this.eraserUpCallback != undefined) {
-      this.eraserUpCallback(event);
+      this.eraserUpCallback(this._currPointerEvent);
     }
   }
 }
