@@ -1,5 +1,3 @@
-import { path } from "d3";
-
 function coordsToPath(points) {
   let pathStr = "";
 
