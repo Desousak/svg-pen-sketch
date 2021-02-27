@@ -39,7 +39,6 @@ function pathToCoords(pathStr) {
 
 function getCachedBoundingClientRect(ele) {
   if (!ele._boundingClientRect) {
-    console.log("Caching bounding client...");
     ele._boundingClientRect = ele.getBoundingClientRect();
   }
   return ele._boundingClientRect;

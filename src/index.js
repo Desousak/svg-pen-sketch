@@ -99,10 +99,13 @@ export default class SvgPenSketch {
 
   getPathsAtPoint(x1, y1, x2, y2) {
     let paths = [];
-
+    
     for (let path of this._element.node().querySelectorAll("path")) {
+      // Get the bounding boxes for all elements on page
       let bbox = PathExtras.getCachedBoundingClientRect(path);
 
+      // If the eraser and the bounding box for the path overlap
+      // and we havent included it already
       if (
         !(
           bbox.x > x2 ||
@@ -115,7 +118,6 @@ export default class SvgPenSketch {
         paths.push(path);
       }
     }
-    console.log(paths);
     return paths;
   }
 
