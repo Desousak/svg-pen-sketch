@@ -42,7 +42,7 @@ function getCachedBoundingClientRect(ele) {
   return ele._boundingClientRect;
 }
 
-function pathHitTest(pathCoords, x, y, range = 1) {
+function pathCoordHitTest(pathCoords, x, y, range = 1) {
   // The bounds
   let xLowerBounds = x - range,
     xUpperBounds = x + range,
@@ -76,7 +76,7 @@ const PathExtras = {
   coordsToPath: coordsToPath,
   pathToCoords: pathToCoords,
   getCachedBoundingClientRect: getCachedBoundingClientRect,
-  pathHitTest: pathHitTest,
+  pathCoordHitTest: pathCoordHitTest,
 };
 
 Object.freeze(PathExtras);
