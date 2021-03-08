@@ -42,10 +42,41 @@ function getCachedBoundingClientRect(ele) {
   return ele._boundingClientRect;
 }
 
+function pathHitTest(pathCoords, x, y, range = 1) {
+  // The bounds
+  let xLowerBounds = x - range,
+    xUpperBounds = x + range,
+    yLowerBounds = y - range,
+    yUpperBounds = y + range;
+  // The indicies of the path coord array that the eraser is over
+  let hitIndicies = [];
+
+  for (let i = 0; i < pathCoords.length; i++) {
+    let xCoord = pathCoords[i][0],
+      yCoord = pathCoords[i][1];
+
+    // If the particular point on the line is within the erasing area
+    // Eraser area = eraser point +- eraserSize in the X and Y directions
+    if (
+      xLowerBounds <= xCoord &&
+      xCoord <= xUpperBounds &&
+      yLowerBounds <= yCoord &&
+      yCoord <= yUpperBounds
+    ) {
+      // If we need to erase this point just create a seperation between the last two points
+      // The seperation is done by creating two new paths
+      hitIndicies.push(i);
+    }
+  }
+
+  return hitIndicies;
+}
+
 const PathExtras = {
   coordsToPath: coordsToPath,
   pathToCoords: pathToCoords,
   getCachedBoundingClientRect: getCachedBoundingClientRect,
+  pathHitTest: pathHitTest,
 };
 
 Object.freeze(PathExtras);
