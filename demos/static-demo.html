@@ -27,7 +27,7 @@
                 let svgSketch = SvgPenSketch.default;
 
                 // Prep the svg element to be drawn on
-                const canvas = new svgSketch(document.querySelector("svg"), { "stroke": "black", "stroke-width": "1px" }, {"minDist": 5});
+                const canvas = new svgSketch(document.querySelector("svg"), { "stroke": "black", "stroke-width": "10px" });
 
                 // Callbacks can be set for various events
                 canvas.penDownCallback = (path, event) => {
@@ -55,6 +55,7 @@
 
                 // Update the color randomly
                 setInterval(_ => {
+                    console.log("test");
                     textElement.style.fill = getRandomColor();
                 }, 500);
             }

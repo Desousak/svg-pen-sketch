@@ -15,6 +15,7 @@ An easy-to-use JavaScript library aimed at making it easier to draw on SVG eleme
 import svgSketch from "svg-pen-sketch";
 
 // Prep the svg element to be drawn on (custom path styles can be passed in optionally)
+
 const strokeStyle =  {"stroke": "red", "stroke-width": "10px"};
 const canvas = new svgSketch(document.querySelector("svg"), strokeStyle);
 
@@ -30,7 +31,7 @@ canvas.penDownCallback = (path, event) => {};
 canvas.penUpCallback = (path, event) => {};
 
 // Same can be done for the eraser end of a pen (if it has one)
-canvas.eraserDownCallback = (removedPaths, event) => {};
+canvas.eraserDownCallback = (editedPaths, event) => {};
 canvas.eraserUpCallback = (event) => {};
 
 // Toggles the use of the eraser
@@ -62,7 +63,7 @@ canvas.toggleForcedEraser();
         canvas.penUpCallback = (path, event) => {};
 
         // Same can be done for the eraser end of a pen (if it has one)
-        canvas.eraserDownCallback = (removedPaths, event) => {};
+        canvas.eraserDownCallback = (editedPaths, event) => {};
         canvas.eraserUpCallback = (event) => {};
 
         // Toggles the use of the eraser
@@ -71,6 +72,15 @@ canvas.toggleForcedEraser();
     </script>
 </body>
 ```
+
+## Stroke Parameters
+- `lineFunc`: The function that converts from points to an SVG Path `d` tag
+- `minDist`: The minimum distance that is allowed between strokes (smaller values preferred for pixel-eraser functionality - but can be slow)
+- `maxTimeDelta`: The maximum time allowed between samples (done to keep a stable sample rate somewhat). Keep in mind this is a ___maximum___, and quicker events can still occur.
+
+## Eraser Parameters
+- `eraserMode`: Which eraser mode to use when erasing. Currently supports `"object"` and `"pixel"` for the object and pixel erasers, respectively
+- `eraserSize`: The size of the eraser handle. Note that small eraser sizes (i.e. 1) can cause skipping issues - it will be addressed in later versions)
 
 ## Build Instructions
 1) Clone the repository and run `npm install`
@@ -81,7 +91,7 @@ canvas.toggleForcedEraser();
 
 ## Todo
 - More tests need to be made
+- Fix stroke recognition issues for the eraser (some portions of strokes are being missed)
 - Try to fix the issue with strokes being cut off if the screen is resized
 - ~~Add some error checking for the element passed in the constructor~~
 - ~~Add some options to change stroke styles~~
-
