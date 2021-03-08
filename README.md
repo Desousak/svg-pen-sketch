@@ -81,8 +81,7 @@ canvas.toggleForcedEraser();
 - `lineFunc`: A function that converts screen coordinates to an SVG Path - can be overwritten to introduce functionality such as the use of splines (various other D3 curve functions can be found <a href="http://bl.ocks.org/d3indepth/b6d4845973089bc1012dec1674d3aff8">here</a>)
 - `minDist`: The minimum distance that is allowed between strokes (smaller values preferred for pixel-eraser functionality - but can be slow)
 - `maxTimeDelta`: The maximum time allowed between samples (done to keep a stable sample rate somewhat). Keep in mind this is a ___maximum___, and quicker events can still occur.
-
-## Eraser Parameters
+### Eraser Parameters
 - `eraserMode`: Which eraser mode to use when erasing. Currently supports `"object"` and `"pixel"` for the object and pixel erasers, respectively
 - `eraserSize`: The size of the eraser handle. Note that small eraser sizes (i.e. 1) can cause skipping issues - it will be addressed in later versions)
 
