@@ -73,8 +73,12 @@ canvas.toggleForcedEraser();
 </body>
 ```
 
-## Stroke Parameters
-- `lineFunc`: The function that converts from points to an SVG Path `d` tag
+
+## Parameters:
+### Stroke Styles:
+- Any CSS style can be applied by adding the style name, and value, in the `strokeStyles` object
+### Stroke Parameters:
+- `lineFunc`: A function that converts screen coordinates to an SVG Path - can be overwritten to introduce functionality such as the use of splines (various other D3 curve functions can be found <a href="http://bl.ocks.org/d3indepth/b6d4845973089bc1012dec1674d3aff8">here</a>)
 - `minDist`: The minimum distance that is allowed between strokes (smaller values preferred for pixel-eraser functionality - but can be slow)
 - `maxTimeDelta`: The maximum time allowed between samples (done to keep a stable sample rate somewhat). Keep in mind this is a ___maximum___, and quicker events can still occur.
 
