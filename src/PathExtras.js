@@ -35,11 +35,11 @@ function pathToCoords(pathStr) {
   return points;
 }
 
-function getCachedBoundingClientRect(ele) {
-  if (!ele._boundingClientRect) {
-    ele._boundingClientRect = ele.getBoundingClientRect();
+function getCachedPathBBox(path) {
+  if (!path._boundingClientRect) {
+    path._boundingClientRect = path.getBBox();
   }
-  return ele._boundingClientRect;
+  return path._boundingClientRect;
 }
 
 function pathCoordHitTest(pathCoords, x, y, range = 1) {
@@ -75,7 +75,7 @@ function pathCoordHitTest(pathCoords, x, y, range = 1) {
 const PathExtras = {
   coordsToPath: coordsToPath,
   pathToCoords: pathToCoords,
-  getCachedBoundingClientRect: getCachedBoundingClientRect,
+  getCachedPathBBox: getCachedPathBBox,
   pathCoordHitTest: pathCoordHitTest,
 };
 

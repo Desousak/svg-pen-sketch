@@ -101,7 +101,7 @@ export default class SvgPenSketch {
 
   // Gets the path elements in a specified range
   // Uses their bounding boxes, so we can't tell if we're actually hitting the stroke with this
-  // Just to determine if a stroke is close 
+  // Just to determine if a stroke is close
   getPathsinRange(x, y, range = 1) {
     // The eraser bounds
     let x1 = x - range,
@@ -112,7 +112,8 @@ export default class SvgPenSketch {
 
     for (let path of this._element.node().querySelectorAll("path")) {
       // Get the bounding boxes for all elements on page
-      let bbox = PathExtras.getCachedBoundingClientRect(path);
+      let bbox = PathExtras.getCachedPathBBox(path);
+      console.log(bbox, x, y);
 
       // If the eraser and the bounding box for the path overlap
       // and we havent included it already
@@ -131,7 +132,7 @@ export default class SvgPenSketch {
     return paths;
   }
 
-  // Remove a stroke if it's within range and the mouse is over it 
+  // Remove a stroke if it's within range and the mouse is over it
   removePaths(x, y, eraserSize = 1) {
     // Prep variables
     let removedPathIDs = [];
@@ -153,7 +154,7 @@ export default class SvgPenSketch {
     return removedPathIDs;
   }
 
-  // Edit (erase) a portion of a stroke 
+  // Edit (erase) a portion of a stroke
   erasePaths(x, y, eraserSize = 1) {
     // The paths within the bounds
     let paths = this.getPathsinRange(x, y, eraserSize);
@@ -282,15 +283,11 @@ export default class SvgPenSketch {
           this._createEraserHandle(x, y);
 
           // Call the eraser event once for the initial on-click
-          this._handleDownEvent((_) =>
-            this._onErase(eraserCoords)
-          );
+          this._handleDownEvent((_) => this._onErase(eraserCoords));
 
           // Create the erase event handlers
           this._element.on("pointermove", (_) => {
-            this._handleDownEvent((_) =>
-              this._onErase(eraserCoords)
-            );
+            this._handleDownEvent((_) => this._onErase(eraserCoords));
           });
           this._element.on("pointerup", (_) =>
             this._handleUpEvent((_) => this._stopErase())
@@ -487,7 +484,7 @@ export default class SvgPenSketch {
       let affectedPaths = null;
 
       // Move the eraser cursor
-      this._moveEraserHandle(x,y);
+      this._moveEraserHandle(x, y);
 
       // Add the points
       eraserCoords.push([x, y]);
@@ -502,7 +499,11 @@ export default class SvgPenSketch {
           );
           break;
         case "pixel":
-          affectedPaths = this.erasePaths(x, y, this.eraserParam.eraserSize / 2);
+          affectedPaths = this.erasePaths(
+            x,
+            y,
+            this.eraserParam.eraserSize / 2
+          );
           break;
         default:
           console.error("ERROR: INVALID ERASER MODE");
