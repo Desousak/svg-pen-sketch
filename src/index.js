@@ -113,7 +113,6 @@ export default class SvgPenSketch {
     for (let path of this._element.node().querySelectorAll("path")) {
       // Get the bounding boxes for all elements on page
       let bbox = PathExtras.getCachedPathBBox(path);
-      console.log(bbox, x, y);
 
       // If the eraser and the bounding box for the path overlap
       // and we havent included it already
