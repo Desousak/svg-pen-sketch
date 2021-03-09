@@ -303,6 +303,8 @@ export default class SvgPenSketch {
   _createEvent() {
     let newEvent = {};
     let features = [
+      "screenX",
+      "screenY",
       "clientX",
       "clientY",
       "offsetX",
@@ -348,7 +350,7 @@ export default class SvgPenSketch {
               // Linearly interpolate it
               newEvent[feat] = MathExtas.lerp(
                 this._prevPointerEvent[feat],
-                d3.event[feat],
+                newEvent[feat],
                 i
               );
             }
@@ -361,7 +363,7 @@ export default class SvgPenSketch {
     }
 
     // Call the proper callback with the "real" event
-    this._currPointerEvent = d3.event;
+    this._currPointerEvent = this._createEvent();
     callback();
     this._prevPointerEvent = this._currPointerEvent;
   }
