@@ -62,6 +62,8 @@ export default class SvgPenSketch {
       });
 
       // Public variables
+      // Handles scaling of parent components
+      this.parentScale = 1;
       // Forces the use of the eraser - even if the pen isn't tilted over
       this.forceEraser = false;
       // Stroke parameters
@@ -401,8 +403,8 @@ export default class SvgPenSketch {
 
     // Calculate the offset using the page location and the canvas' offset (also taking scroll into account)
     let x =
-        event.pageX - canvasContainer.x - document.scrollingElement.scrollLeft,
-      y = event.pageY - canvasContainer.y - document.scrollingElement.scrollTop;
+        (event.pageX - canvasContainer.x) / this.parentScale - document.scrollingElement.scrollLeft,
+      y = (event.pageY - canvasContainer.y) / this.parentScale - document.scrollingElement.scrollTop;
 
     return [x, y];
   }
