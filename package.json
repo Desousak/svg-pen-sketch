@@ -27,7 +27,7 @@
         "babel-jest": "^26.3.0",
         "cssnano": "^4.1.10",
         "jest": "^26.4.2",
-        "parcel": "^1.12.4"
+        "parcel": "^2.8.2"
     },
     "dependencies": {
         "core-js": "^3.6.5",
